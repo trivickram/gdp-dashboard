@@ -207,188 +207,40 @@ for i, prod in enumerate(products):
 
 # ------------------------------
 # Sentiment Analysis (Static for Now)
-# # ------------------------------
-# st.subheader("🗣️ Customer Sentiment")
-# col6, col7 = st.columns(2)
-# with col6:
-#     st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
-#     st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
-#     # Word cloud (simulated)
-#     from wordcloud import WordCloud
-#     import matplotlib.pyplot as plt
-#     wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
-#     wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
-#     plt.figure(figsize=(4,2))
-#     plt.imshow(wordcloud, interpolation='bilinear')
-#     plt.axis('off')
-#     st.pyplot(plt)
+# ------------------------------
+st.subheader("🗣️ Customer Sentiment")
+st.markdown("""
+This section summarizes what customers are saying about the company and its products, based on online reviews and product focus. The visuals below are simulated for demonstration purposes.
+""")
+col6, col7 = st.columns(2)
+with col6:
+    st.markdown(f"**Average Online Rating:** {company_data['Avg Online Rating']}")
+    # st.markdown(f"**Overall Sentiment:** {company_data['Sentiment Analysis']}")
+    st.markdown("<span style='font-size: 0.95em; color: #555;'>Word Cloud of Most Commonly Mentioned Health Issues and Products</span>", unsafe_allow_html=True)
+    from wordcloud import WordCloud
+    import matplotlib.pyplot as plt
+    wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
+    wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
+    plt.figure(figsize=(4,2))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    st.pyplot(plt)
+    st.caption("Larger words indicate more frequent mentions in product descriptions and reviews.")
 
-# with col7:
-#     # Simulated sentiment pie chart
-#     fig_sent = px.pie(names=['Positive', 'Negative'], values=[80, 20], title="Sentiment Split", color_discrete_sequence=px.colors.sequential.Greens)
-#     st.plotly_chart(fig_sent, use_container_width=True, key="sentiment_pie")
+with col7:
+    st.markdown("<span style='font-size: 0.95em; color: #555;'>Simulated Sentiment Split from Online Reviews</span>", unsafe_allow_html=True)
+    fig_sent = px.pie(names=['Positive', 'Negative'], values=[80, 20], title="Sentiment Split", color_discrete_sequence=px.colors.sequential.Greens)
+    fig_sent.update_traces(textinfo='percent+label')
+    st.plotly_chart(fig_sent, use_container_width=True, key="sentiment_pie")
+    st.caption("This pie chart shows the estimated proportion of positive vs. negative customer feedback.")
 
 # ------------------------------
-# OmniActive Comparison
+# Sentiment Summary Table
 # ------------------------------
-st.subheader("🆚 Comparison with OmniActive")
-st.markdown(company_data['Compared to OmniActive'])
-
-# ------------------------------
-# OmniActive Comparison (Detailed & Visual)
-# ------------------------------
-st.subheader("🆚 Detailed Comparison with OmniActive")
-
-# Prepare comparison data
-comparison_cols = [
-    "Company Name", "Type", "Annual Revenue", "Growth Trend", "Product Categories", "No. of Products", "Avg Online Rating", "Patents Filed/Granted", "Regulatory Approvals", "Compared to OmniActive"
-]
-comparison_df = data[comparison_cols].copy()
-
-# Add OmniActive as a reference row (simulated values)
-omniactive_row = {
-    "Company Name": "OmniActive Health Technologies",
-    "Type": "B2B (nutraceutical ingredients)",
-    "Annual Revenue": "~₹600 Cr (2024 est.)",
-    "Growth Trend": "+10% YoY (simulated)",
-    "Product Categories": "Lutein, Zeaxanthin, Curcumin, Plant Extracts",
-    "No. of Products": "20+ ingredients",
-    "Avg Online Rating": "N/A (B2B)",
-    "Patents Filed/Granted": "30+ global patents",
-    "Regulatory Approvals": "US FDA, FSSAI, EU Novel Food, GRAS",
-    "Compared to OmniActive": "-"
-}
-comparison_df = pd.concat([comparison_df, pd.DataFrame([omniactive_row])], ignore_index=True)
-
-# Show table
-st.dataframe(comparison_df.set_index("Company Name"))
-
-# Visual: Revenue Comparison (bar chart)
-revenues = comparison_df["Annual Revenue"].apply(parse_revenue)
-fig_rev = px.bar(
-    x=comparison_df["Company Name"],
-    y=revenues,
-    labels={"x": "Company", "y": "Revenue (Cr INR, approx)"},
-    title="Annual Revenue Comparison",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_rev.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_rev, use_container_width=True, key="rev_bar")
-
-# Visual: Product Count
-product_counts = comparison_df["No. of Products"].apply(parse_products)
-fig_prod = px.bar(
-    x=comparison_df["Company Name"],
-    y=product_counts,
-    labels={"x": "Company", "y": "# Products (approx)"},
-    title="Number of Products/Ingredients",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_prod.update_layout(xaxis_tickangle=-30)
-st.plotly_chart(fig_prod, use_container_width=True, key="prod_bar")
-
-# Visual: Growth Trend (numeric, not categorical)
-growth_vals = comparison_df["Growth Trend"].apply(parse_growth)
-fig_growth = px.bar(
-    x=comparison_df["Company Name"],
-    y=growth_vals,
-    labels={"x": "Company", "y": "Growth % (YoY)"},
-    title="Growth Trend (YoY %)",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_growth.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_growth, use_container_width=True, key="growth_bar")
-
-# Visual: Patents Filed/Granted (simulated)
-def parse_patents(val):
-    if pd.isna(val): return 0
-    m = re.search(r"(\d+)", str(val))
-    return int(m.group(1)) if m else 0
-patent_counts = comparison_df["Patents Filed/Granted"].apply(parse_patents)
-fig_pat = px.bar(
-    x=comparison_df["Company Name"],
-    y=patent_counts,
-    labels={"x": "Company", "y": "# Patents (approx)"},
-    title="Patents Filed/Granted",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_pat.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_pat, use_container_width=True, key="pat_bar")
-
-# Visual: Regulatory Approvals (count, simulated)
-reg_counts = comparison_df["Regulatory Approvals"].apply(lambda x: len(str(x).split(",")) if pd.notna(x) else 0)
-fig_reg = px.bar(
-    x=comparison_df["Company Name"],
-    y=reg_counts,
-    labels={"x": "Company", "y": "# Regulatory Approvals (simulated)"},
-    title="Regulatory Approvals (Count, Simulated)",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_reg.update_layout(xaxis_tickangle=-30)
-st.plotly_chart(fig_reg, use_container_width=True, key="reg_bar")
-
-# Improved Radar Chart: Key Parameters (normalized)
-radar_params = ["Revenue", "Product Count", "Growth", "Patents", "Reg Approvals"]
-radar_data = pd.DataFrame({
-    "Company": comparison_df["Company Name"],
-    "Revenue": revenues / (revenues.max() or 1),
-    "Product Count": product_counts / (product_counts.max() or 1),
-    "Growth": (growth_vals - growth_vals.min()) / ((growth_vals.max() - growth_vals.min()) or 1),
-    "Patents": patent_counts / (patent_counts.max() or 1),
-    "Reg Approvals": reg_counts / (reg_counts.max() or 1)
-})
-radar_selected = radar_data[radar_data["Company"] == st.session_state.company]
-radar_omni = radar_data[radar_data["Company"] == "OmniActive Health Technologies"]
-import plotly.graph_objects as go
-fig_radar = go.Figure()
-fig_radar.add_trace(go.Scatterpolar(r=radar_selected.iloc[0,1:], theta=radar_params, fill='toself', name=st.session_state.company))
-fig_radar.add_trace(go.Scatterpolar(r=radar_omni.iloc[0,1:], theta=radar_params, fill='toself', name="OmniActive"))
-fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,1])), showlegend=True, title="Comparative Radar Analysis (Normalized)")
-# st.plotly_chart(fig_radar, use_container_width=True, key="radar_chart_comp")
-
-# Improved Geographical Presence Map
-import plotly.express as px
-country_map = {
-    "India": "IND", "USA": "USA", "Europe": "FRA", "Asia": "CHN", "Oceania": "AUS", "Middle East": "ARE", "Russia": "RUS", "Africa": "ZAF", "SAARC": "BGD"
-}
-def extract_countries(text):
-    found = []
-    for k, v in country_map.items():
-        if k.lower() in text.lower():
-            found.append(v)
-    return found or ["IND"]
-geo_countries = extract_countries(company_data['Geographical Presence'])
-fig_geo = px.choropleth(locations=geo_countries, locationmode="ISO-3", color=[1]*len(geo_countries),
-                        color_continuous_scale=px.colors.sequential.Greens, title="Geographical Presence (by Country)")
-# st.plotly_chart(fig_geo, use_container_width=True, key="geo_choropleth")
-
-# ------------------------------
-# Sentiment Analysis (Static for Now)
-# # ------------------------------
-# st.subheader("🗣️ Customer Sentiment")
-# col6, col7 = st.columns(2)
-# with col6:
-#     st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
-#     st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
-#     # Word cloud (simulated)
-#     from wordcloud import WordCloud
-#     import matplotlib.pyplot as plt
-#     wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
-#     wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
-#     plt.figure(figsize=(4,2))
-#     plt.imshow(wordcloud, interpolation='bilinear')
-#     plt.axis('off')
-#     st.pyplot(plt)
-
-# with col7:
-#     # Simulated sentiment pie chart
-#     fig_sent = px.pie(names=['Positive', 'Negative'], values=[80, 20], title="Sentiment Split", color_discrete_sequence=px.colors.sequential.Greens)
-#     st.plotly_chart(fig_sent, use_container_width=True, key="sentiment_pie")
+st.subheader("📊 Sentiment Summary Table")
+sentiment_df = data[["Company Name", "Avg Rating", "Sentiment Highlights"]].copy()
+sentiment_df = sentiment_df.rename(columns={"Company Name": "Company"})
+st.dataframe(sentiment_df, hide_index=True)
 
 # ------------------------------
 # OmniActive Comparison
@@ -480,168 +332,6 @@ fig_pat = px.bar(
 )
 fig_pat.update_layout(xaxis_tickangle=-30)
 st.plotly_chart(fig_pat, use_container_width=True, key="pat_bar")
-
-# Visual: Regulatory Approvals (count, simulated)
-reg_counts = comparison_df["Regulatory Approvals"].apply(lambda x: len(str(x).split(",")) if pd.notna(x) else 0)
-fig_reg = px.bar(
-    x=comparison_df["Company Name"],
-    y=reg_counts,
-    labels={"x": "Company", "y": "# Regulatory Approvals (simulated)"},
-    title="Regulatory Approvals (Count, Simulated)",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_reg.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_reg, use_container_width=True, key="reg_bar")
-
-# Improved Radar Chart: Key Parameters (normalized)
-radar_params = ["Revenue", "Product Count", "Growth", "Patents", "Reg Approvals"]
-radar_data = pd.DataFrame({
-    "Company": comparison_df["Company Name"],
-    "Revenue": revenues / (revenues.max() or 1),
-    "Product Count": product_counts / (product_counts.max() or 1),
-    "Growth": (growth_vals - growth_vals.min()) / ((growth_vals.max() - growth_vals.min()) or 1),
-    "Patents": patent_counts / (patent_counts.max() or 1),
-    "Reg Approvals": reg_counts / (reg_counts.max() or 1)
-})
-radar_selected = radar_data[radar_data["Company"] == st.session_state.company]
-radar_omni = radar_data[radar_data["Company"] == "OmniActive Health Technologies"]
-import plotly.graph_objects as go
-fig_radar = go.Figure()
-fig_radar.add_trace(go.Scatterpolar(r=radar_selected.iloc[0,1:], theta=radar_params, fill='toself', name=st.session_state.company))
-fig_radar.add_trace(go.Scatterpolar(r=radar_omni.iloc[0,1:], theta=radar_params, fill='toself', name="OmniActive"))
-fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,1])), showlegend=True, title="Comparative Radar Analysis (Normalized)")
-# st.plotly_chart(fig_radar, use_container_width=True, key="radar_chart_comp")
-
-# Improved Geographical Presence Map
-import plotly.express as px
-country_map = {
-    "India": "IND", "USA": "USA", "Europe": "FRA", "Asia": "CHN", "Oceania": "AUS", "Middle East": "ARE", "Russia": "RUS", "Africa": "ZAF", "SAARC": "BGD"
-}
-def extract_countries(text):
-    found = []
-    for k, v in country_map.items():
-        if k.lower() in text.lower():
-            found.append(v)
-    return found or ["IND"]
-geo_countries = extract_countries(company_data['Geographical Presence'])
-fig_geo = px.choropleth(locations=geo_countries, locationmode="ISO-3", color=[1]*len(geo_countries),
-                        color_continuous_scale=px.colors.sequential.Greens, title="Geographical Presence (by Country)")
-# st.plotly_chart(fig_geo, use_container_width=True, key="geo_choropleth")
-
-# ------------------------------
-# Sentiment Analysis (Static for Now)
-# ------------------------------
-st.subheader("🗣️ Customer Sentiment")
-col6, col7 = st.columns(2)
-with col6:
-    st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
-    st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
-    # Word cloud (simulated)
-    from wordcloud import WordCloud
-    import matplotlib.pyplot as plt
-    wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
-    wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
-    plt.figure(figsize=(4,2))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    st.pyplot(plt)
-
-# with col7:
-#     # Simulated sentiment pie chart
-#     fig_sent = px.pie(names=['Positive', 'Negative'], values=[80, 20], title="Sentiment Split", color_discrete_sequence=px.colors.sequential.Greens)
-#     st.plotly_chart(fig_sent, use_container_width=True, key="sentiment_pie")
-
-# ------------------------------
-# OmniActive Comparison
-# ------------------------------
-st.subheader("🆚 Comparison with OmniActive")
-st.markdown(company_data['Compared to OmniActive'])
-
-# ------------------------------
-# OmniActive Comparison (Detailed & Visual)
-# ------------------------------
-st.subheader("🆚 Detailed Comparison with OmniActive")
-
-# Prepare comparison data
-comparison_cols = [
-    "Company Name", "Type", "Annual Revenue", "Growth Trend", "Product Categories", "No. of Products", "Avg Online Rating", "Patents Filed/Granted", "Regulatory Approvals", "Compared to OmniActive"
-]
-comparison_df = data[comparison_cols].copy()
-
-# Add OmniActive as a reference row (simulated values)
-omniactive_row = {
-    "Company Name": "OmniActive Health Technologies",
-    "Type": "B2B (nutraceutical ingredients)",
-    "Annual Revenue": "~₹600 Cr (2024 est.)",
-    "Growth Trend": "+10% YoY (simulated)",
-    "Product Categories": "Lutein, Zeaxanthin, Curcumin, Plant Extracts",
-    "No. of Products": "20+ ingredients",
-    "Avg Online Rating": "N/A (B2B)",
-    "Patents Filed/Granted": "30+ global patents",
-    "Regulatory Approvals": "US FDA, FSSAI, EU Novel Food, GRAS",
-    "Compared to OmniActive": "-"
-}
-comparison_df = pd.concat([comparison_df, pd.DataFrame([omniactive_row])], ignore_index=True)
-
-# Show table
-st.dataframe(comparison_df.set_index("Company Name"))
-
-# Visual: Revenue Comparison (bar chart)
-revenues = comparison_df["Annual Revenue"].apply(parse_revenue)
-fig_rev = px.bar(
-    x=comparison_df["Company Name"],
-    y=revenues,
-    labels={"x": "Company", "y": "Revenue (Cr INR, approx)"},
-    title="Annual Revenue Comparison",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_rev.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_rev, use_container_width=True, key="rev_bar")
-
-# Visual: Product Count
-product_counts = comparison_df["No. of Products"].apply(parse_products)
-fig_prod = px.bar(
-    x=comparison_df["Company Name"],
-    y=product_counts,
-    labels={"x": "Company", "y": "# Products (approx)"},
-    title="Number of Products/Ingredients",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_prod.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_prod, use_container_width=True, key="prod_bar")
-
-# Visual: Growth Trend (numeric, not categorical)
-growth_vals = comparison_df["Growth Trend"].apply(parse_growth)
-fig_growth = px.bar(
-    x=comparison_df["Company Name"],
-    y=growth_vals,
-    labels={"x": "Company", "y": "Growth % (YoY)"},
-    title="Growth Trend (YoY %)",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_growth.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_growth, use_container_width=True, key="growth_bar")
-
-# Visual: Patents Filed/Granted (simulated)
-def parse_patents(val):
-    if pd.isna(val): return 0
-    m = re.search(r"(\d+)", str(val))
-    return int(m.group(1)) if m else 0
-patent_counts = comparison_df["Patents Filed/Granted"].apply(parse_patents)
-fig_pat = px.bar(
-    x=comparison_df["Company Name"],
-    y=patent_counts,
-    labels={"x": "Company", "y": "# Patents (approx)"},
-    title="Patents Filed/Granted",
-    color=comparison_df["Company Name"],
-    color_discrete_sequence=px.colors.sequential.Greens
-)
-fig_pat.update_layout(xaxis_tickangle=-30)
-# st.plotly_chart(fig_pat, use_container_width=True, key="pat_bar")
 
 # Visual: Regulatory Approvals (count, simulated)
 reg_counts = comparison_df["Regulatory Approvals"].apply(lambda x: len(str(x).split(",")) if pd.notna(x) else 0)
