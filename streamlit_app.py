@@ -207,21 +207,21 @@ for i, prod in enumerate(products):
 
 # ------------------------------
 # Sentiment Analysis (Static for Now)
-# ------------------------------
-st.subheader("🗣️ Customer Sentiment")
-col6, col7 = st.columns(2)
-with col6:
-    st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
-    st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
-    # Word cloud (simulated)
-    from wordcloud import WordCloud
-    import matplotlib.pyplot as plt
-    wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
-    wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
-    plt.figure(figsize=(4,2))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    st.pyplot(plt)
+# # ------------------------------
+# st.subheader("🗣️ Customer Sentiment")
+# col6, col7 = st.columns(2)
+# with col6:
+#     st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
+#     st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
+#     # Word cloud (simulated)
+#     from wordcloud import WordCloud
+#     import matplotlib.pyplot as plt
+#     wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
+#     wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
+#     plt.figure(figsize=(4,2))
+#     plt.imshow(wordcloud, interpolation='bilinear')
+#     plt.axis('off')
+#     st.pyplot(plt)
 
 # with col7:
 #     # Simulated sentiment pie chart
@@ -369,21 +369,21 @@ fig_geo = px.choropleth(locations=geo_countries, locationmode="ISO-3", color=[1]
 
 # ------------------------------
 # Sentiment Analysis (Static for Now)
-# ------------------------------
-st.subheader("🗣️ Customer Sentiment")
-col6, col7 = st.columns(2)
-with col6:
-    st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
-    st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
-    # Word cloud (simulated)
-    from wordcloud import WordCloud
-    import matplotlib.pyplot as plt
-    wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
-    wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
-    plt.figure(figsize=(4,2))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    st.pyplot(plt)
+# # ------------------------------
+# st.subheader("🗣️ Customer Sentiment")
+# col6, col7 = st.columns(2)
+# with col6:
+#     st.markdown(f"**Rating:** {company_data['Avg Online Rating']}")
+#     st.markdown(f"**Sentiment:** {company_data['Sentiment Analysis']}")
+#     # Word cloud (simulated)
+#     from wordcloud import WordCloud
+#     import matplotlib.pyplot as plt
+#     wc_text = company_data['Health Issues Targeted'] + ' ' + company_data['Top 3 Products']
+#     wordcloud = WordCloud(width=300, height=200, background_color='white', colormap='Greens').generate(wc_text)
+#     plt.figure(figsize=(4,2))
+#     plt.imshow(wordcloud, interpolation='bilinear')
+#     plt.axis('off')
+#     st.pyplot(plt)
 
 # with col7:
 #     # Simulated sentiment pie chart
