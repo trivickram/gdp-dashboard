@@ -156,24 +156,24 @@ for i, prod in enumerate(products):
 # ------------------------------
 # Maps Section (To be expanded with geopandas/plotly mapbox)
 # ------------------------------
-st.subheader("🗺️ Geographical Presence")
-st.markdown(company_data['Geographical Presence'])
-# Simulated map (India focus)
-import plotly.graph_objects as go
-fig_map = go.Figure(go.Scattergeo(
-    locationmode = 'country names',
-    locations = ['India'],
-    text = [company_data['Company Name']],
-    marker = dict(size = 30, color = 'green', line_width=0)
-))
-fig_map.update_geos(fitbounds="locations", visible=False)
-fig_map.update_layout(title="Geographical Presence (Simulated)", geo=dict(bgcolor='rgba(0,0,0,0)'))
-st.plotly_chart(fig_map, use_container_width=True, key="geo_map")
+# st.subheader("🗺️ Geographical Presence")
+# st.markdown(company_data['Geographical Presence'])
+# # Simulated map (India focus)
+# import plotly.graph_objects as go
+# fig_map = go.Figure(go.Scattergeo(
+#     locationmode = 'country names',
+#     locations = ['India'],
+#     text = [company_data['Company Name']],
+#     marker = dict(size = 30, color = 'green', line_width=0)
+# ))
+# fig_map.update_geos(fitbounds="locations", visible=False)
+# fig_map.update_layout(title="Geographical Presence (Simulated)", geo=dict(bgcolor='rgba(0,0,0,0)'))
+# st.plotly_chart(fig_map, use_container_width=True, key="geo_map")
 
-# Simulated heatmap for market concentration
-st.markdown("#### Market Concentration Heatmap (Simulated)")
-fig_heat = go.Figure(data=go.Heatmap(z=[[1, 0.5], [0.7, 0.2]], x=['North', 'South'], y=['East', 'West'], colorscale='Greens'))
-st.plotly_chart(fig_heat, use_container_width=True, key="heatmap")
+# # Simulated heatmap for market concentration
+# st.markdown("#### Market Concentration Heatmap (Simulated)")
+# fig_heat = go.Figure(data=go.Heatmap(z=[[1, 0.5], [0.7, 0.2]], x=['North', 'South'], y=['East', 'West'], colorscale='Greens'))
+# st.plotly_chart(fig_heat, use_container_width=True, key="heatmap")
 
 # ------------------------------
 # Sentiment Analysis (Static for Now)
