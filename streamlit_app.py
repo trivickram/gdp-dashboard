@@ -163,7 +163,7 @@ st.plotly_chart(fig3, use_container_width=True, key="bubble_chart")
 st.markdown("#### Comparative Radar Analysis")
 radar_params = ['R&D', 'Product Range', 'Revenue', 'Market Presence', 'Innovation']
 radar_values = [70, 80, 90, 85, 75]
-fig4 = px.line_polar(r=radar_values, theta=radar_params, line_close=True, title="Key Parameters (Simulated)", color_discrete_sequence=px.colors.sequential.Greens)
+fig4 = px.line_polar(r=radar_values, theta=radar_params, line_close=True, title="Key Parameters (Simulated)", color_discrete_sequence=px.colors.sequential.Rainbow)
 fig4.update_traces(fill='toself')
 st.plotly_chart(fig4, use_container_width=True, key="radar_chart_sim")
 
@@ -226,13 +226,6 @@ with col6:
     plt.axis('off')
     st.pyplot(plt)
     st.caption("Larger words indicate more frequent mentions in product descriptions and reviews.")
-
-with col7:
-    st.markdown("<span style='font-size: 0.95em; color: #555;'>Simulated Sentiment Split from Online Reviews</span>", unsafe_allow_html=True)
-    fig_sent = px.pie(names=['Positive', 'Negative'], values=[80, 20], title="Sentiment Split", color_discrete_sequence=px.colors.sequential.Greens)
-    fig_sent.update_traces(textinfo='percent+label')
-    st.plotly_chart(fig_sent, use_container_width=True, key="sentiment_pie")
-    st.caption("This pie chart shows the estimated proportion of positive vs. negative customer feedback.")
 
 # ------------------------------
 # Sentiment Summary Table
