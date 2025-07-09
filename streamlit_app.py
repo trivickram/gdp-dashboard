@@ -9,10 +9,24 @@ import re
 import streamlit.components.v1 as components
 from difflib import get_close_matches
 
+# =====================
+# GEMINI SETUP
+# =====================
+import google.generativeai as genai
+
+if "GEMINI_API_KEY" in st.secrets:
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    gemini_model = genai.GenerativeModel("gemini-2.5-flash")
+else:
+    gemini_model = None
+
 # ------------------------------
 # Load Data
 # ------------------------------
 data = pd.read_csv("Top_6_Indian_Herbal_Companies_Comparison.csv")
+if not os.path.exists("Top_6_Indian_Herbal_Companies_Comparison.csv"):
+    st.error("Data file missing. Please upload 'Top_6_Indian_Herbal_Companies_Comparison.csv'.")
+    st.stop()
 
 # ------------------------------
 # Page Config
@@ -58,10 +72,17 @@ def parse_growth(val):
 # ------------------------------
 # Sidebar
 # ------------------------------
-st.sidebar.title("🔍 Voice Activated Search")
+st.sidebar.title("🌿 Herbal Dashboard Assistant")
 
-# Browser-based voice search using JS Web Speech API
-voice_text = st.sidebar.text_input("Say a company name or type it:", value=st.session_state.get("company", ""), key="voice_input")
+# --- Voice Search Section ---
+st.sidebar.markdown("#### 🎙️ Voice or Text Search")
+st.sidebar.info("Tip: Voice search works best in Google Chrome with microphone permissions enabled.")
+
+voice_text = st.sidebar.text_input(
+    "Say a company name or type it below:",
+    value=st.session_state.get("company", ""),
+    key="voice_input"
+)
 
 voice_js = '''
 <script>
@@ -92,7 +113,7 @@ window.addEventListener("message", (event) => {
     }
 });
 </script>
-<button onclick="startDictation()">🎙️ Speak</button>
+<button onclick="startDictation()" style="margin-top: 5px; margin-bottom: 10px;">🎙 Speak</button>
 '''
 components.html(voice_js, height=50)
 
@@ -107,14 +128,54 @@ if voice_text:
 else:
     st.session_state.company = company_names[0]
 
-selected_company = st.sidebar.selectbox("Or select a company manually", company_names, index=company_names.index(st.session_state.company))
+selected_company = st.sidebar.selectbox(
+    "Or select a company manually:",
+    company_names,
+    index=company_names.index(st.session_state.company),
+    help="Pick a company to view its dashboard"
+)
 st.session_state.company = selected_company
+
+st.sidebar.markdown("---")
+
+# --- Gemini Chat Section ---
+st.sidebar.markdown("#### 🤖 Ask Gemini")
+user_input = st.sidebar.text_input(
+    "Ask about the Indian herbal industry:",
+    key="gemini_input",
+    placeholder="e.g. What is the market share of Himalaya?"
+)
+
+if "last_gemini_input" not in st.session_state:
+    st.session_state.last_gemini_input = ""
+if "gemini_response_text" not in st.session_state:
+    st.session_state.gemini_response_text = ""
+
+if user_input and user_input != st.session_state.last_gemini_input and gemini_model:
+    with st.sidebar:
+        with st.spinner("Thinking..."):
+            try:
+                gemini_response = gemini_model.generate_content(f"""
+                You are an expert assistant on Indian herbal supplement industry.
+                Based on the following user query, give clear and concise information: "{user_input}"
+                """)
+                st.session_state.gemini_response_text = gemini_response.text
+            except Exception as e:
+                st.session_state.gemini_response_text = "Gemini failed. Please check your API key or connection."
+    st.session_state.last_gemini_input = user_input
+
+if user_input:
+    st.sidebar.markdown("##### Response:")
+    st.sidebar.write(st.session_state.gemini_response_text)
+
+st.sidebar.markdown("---")
+st.sidebar.caption("© 2025 Indian Herbal Dashboard")
 
 # ------------------------------
 # Landing Section
 # ------------------------------
 st.title("🌿 Indian Herbal Supplement Industry Dashboard")
-st.markdown(f"### Company Overview: **{st.session_state.company}**")
+st.markdown(f"### Company Overview: *{st.session_state.company}*")
 
 company_data = data[data["Company Name"] == st.session_state.company].iloc[0]
 
@@ -130,8 +191,8 @@ with col2:
     st.metric("Top Product", company_data["Top 3 Products"].split(",")[0])
 
 with col3:
-    st.markdown(f"**Website:** [{company_data['Website']}]({company_data['Website']})")
-    st.markdown(f"**Tagline/Type:** {company_data['Type']}")
+    st.markdown(f"*Website:* [{company_data['Website']}]({company_data['Website']})")
+    st.markdown(f"*Tagline/Type:* {company_data['Type']}")
 
 # ------------------------------
 # Charts Section
@@ -178,15 +239,15 @@ claims = company_data['Scientific Claims'].split(';') if ';' in company_data['Sc
 
 for i, prod in enumerate(products):
     with st.expander(f"{prod}"):
-        st.markdown(f"**Ingredients:** {ingredients[i] if i < len(ingredients) else ingredients[0]}")
-        st.markdown(f"**Benefits/Issues Addressed:** {benefits[i] if i < len(benefits) else benefits[0]}")
-        st.markdown(f"**Scientific Claims:** {claims[i] if i < len(claims) else claims[0]}")
-        st.markdown(f"**User Reviews Summary:** Simulated positive reviews for {prod}.")
+        st.markdown(f"*Ingredients:* {ingredients[i] if i < len(ingredients) else ingredients[0]}")
+        st.markdown(f"*Benefits/Issues Addressed:* {benefits[i] if i < len(benefits) else benefits[0]}")
+        st.markdown(f"*Scientific Claims:* {claims[i] if i < len(claims) else claims[0]}")
+        st.markdown(f"*User Reviews Summary:* Simulated positive reviews for {prod}.")
 
 # ------------------------------
 # Maps Section (To be expanded with geopandas/plotly mapbox)
 # ------------------------------
-# st.subheader("🗺️ Geographical Presence")
+# st.subheader("🗺 Geographical Presence")
 # st.markdown(company_data['Geographical Presence'])
 # # Simulated map (India focus)
 # import plotly.graph_objects as go
@@ -208,14 +269,14 @@ for i, prod in enumerate(products):
 # ------------------------------
 # Sentiment Analysis (Static for Now)
 # ------------------------------
-st.subheader("🗣️ Customer Sentiment")
+st.subheader("🗣 Customer Sentiment")
 st.markdown("""
 This section summarizes what customers are saying about the company and its products, based on online reviews and product focus. The visuals below are simulated for demonstration purposes.
 """)
 col6, col7 = st.columns(2)
 with col6:
-    st.markdown(f"**Average Online Rating:** {company_data['Avg Online Rating']}")
-    # st.markdown(f"**Overall Sentiment:** {company_data['Sentiment Analysis']}")
+    st.markdown(f"*Average Online Rating:* {company_data['Avg Online Rating']}")
+    # st.markdown(f"*Overall Sentiment:* {company_data['Sentiment Analysis']}")
     st.markdown("<span style='font-size: 0.95em; color: #555;'>Word Cloud of Most Commonly Mentioned Health Issues and Products</span>", unsafe_allow_html=True)
     from wordcloud import WordCloud
     import matplotlib.pyplot as plt
