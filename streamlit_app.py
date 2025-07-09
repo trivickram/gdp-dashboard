@@ -139,7 +139,7 @@ st.session_state.company = selected_company
 st.sidebar.markdown("---")
 
 # --- Gemini Chat Section ---
-st.sidebar.markdown("#### 🤖 Ask Gemini")
+st.sidebar.markdown("#### 🤖 Ask Pharmabot")
 user_input = st.sidebar.text_input(
     "Ask about the Indian herbal industry:",
     key="gemini_input",
